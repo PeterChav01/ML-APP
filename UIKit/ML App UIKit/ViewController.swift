@@ -7,14 +7,24 @@
 
 import UIKit
 
-class ViewController: UIViewController {
-
+class ViewController: UIViewController, UITextFieldDelegate /* UISearchBarDelegate */ {
     // MARK: - UI Components
-    private lazy var searchBar: UISearchBar = {
-        let searchBar = UISearchBar()
+    /*
+    private lazy var searchBar: UITextField = {
+        let searchBar = UITextField()
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         return searchBar
     }()
+    */
+    
+    
+    private lazy var searchBar: UISearchBar = {
+        let searchBar = UISearchBar()
+        searchBar.delegate = self
+        searchBar.translatesAutoresizingMaskIntoConstraints = false
+        return searchBar
+    }()
+    
     
     private lazy var tableView: UITableView = {
         let table = UITableView()
@@ -26,18 +36,16 @@ class ViewController: UIViewController {
     
     
     private let table = UITableView()
+   
+    private var search: String? = ""
     
-    private let products = [
-        "iPhone",
-        "Ipad",
-        "Apple Watch",
-        "iMac",
-        "MacBook"
-    ]
     // {}
     
+    private let networkManager: ServiceProtocol
+     
     // MARK: - Init
-    init() {
+    init(networkMananager: ServiceProtocol) {
+        self.networkManager = networkMananager
         super.init(nibName: nil, bundle: nil)
         view.backgroundColor = .white
     }
@@ -46,20 +54,24 @@ class ViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    var product = Product(results: [])
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setupNavBar()
         setupSearchBar()
         setupTableView()
+        
     }
     
     private func setupNavBar() {
-        title = "hola"
+        title = "MercadoLibre"
     }
     
     private func setupSearchBar() {
         // 1. Agregar search bar a la vista del viewcontroller
         view.addSubview(searchBar)
+        searchBar.placeholder = "Buscar Producto"
         
         // 2. Agregar constraints al search bar
         // x, y, width, height
@@ -87,25 +99,61 @@ class ViewController: UIViewController {
         
     }
     
+    /*
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        print(searchBar.text!)
+        search = searchBar.text
+        return true
+    }
+    */
+    
 }
 
 // MARK: - UITableViewDelegate
 extension ViewController: UITableViewDelegate {
-    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print(products[indexPath.row])
+       // print(products[indexPath.row])
     }
 }
 
 // MARK: - UITableViewDataSource
 extension ViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return products.count
+        return product.results.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell()
-        cell.textLabel?.text = products[indexPath.row]
+        cell.textLabel?.text = product.results[indexPath.row].title
         return cell
     }
 }
+
+
+//  MARK: - Get data from searchbar
+    
+extension ViewController: UISearchBarDelegate {
+    
+    public func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        print("\(searchText)")
+        networkManager.fetchData(for: "https://api.mercadolibre.com/sites/MLM/search?q=iphone") { result in
+            switch result {
+            case .success(let data):
+                
+                DispatchQueue.main.async {
+                    self.product = data
+                    self.tableView.reloadData()
+                }
+                
+            case .failure(let error):
+                print(error)
+            }
+            
+        }
+    }
+    
+//    func searchBarButton(searchBar: UISearchBar){
+//        print("\(searchBar.text ?? "")")
+//    }
+}
+
