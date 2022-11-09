@@ -35,13 +35,14 @@ class ViewController: UIViewController, UITextFieldDelegate /* UISearchBarDelega
     }()
     
     
-    private let table = UITableView()
-   
-    private var search: String? = ""
+
     
-    // {}
+    private let table = UITableView()
     
     private let networkManager: ServiceProtocol
+    
+    private let debounce = Debounce(timeInterval: 2.5, queue: .global(qos: .userInitiated))
+    
      
     // MARK: - Init
     init(networkMananager: ServiceProtocol) {
@@ -99,14 +100,6 @@ class ViewController: UIViewController, UITextFieldDelegate /* UISearchBarDelega
         
     }
     
-    /*
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        print(searchBar.text!)
-        search = searchBar.text
-        return true
-    }
-    */
-    
 }
 
 // MARK: - UITableViewDelegate
@@ -135,22 +128,54 @@ extension ViewController: UITableViewDataSource {
 extension ViewController: UISearchBarDelegate {
     
     public func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        print("\(searchText)")
-        networkManager.fetchData(for: "https://api.mercadolibre.com/sites/MLM/search?q=iphone") { result in
-            switch result {
-            case .success(let data):
-                
-                DispatchQueue.main.async {
-                    self.product = data
-                    self.tableView.reloadData()
+        debounce.dispatch {
+            print("\(searchText)")
+            self.networkManager.fetchData(for: "https://api.mercadolibre.com/sites/MLM/search?q=iphone") { result in
+                switch result {
+                case .success(let data):
+                    
+                    DispatchQueue.main.async {
+                        self.product = data
+                        self.tableView.reloadData()
+                    }
+                    
+                case .failure(let error):
+                    print(error)
                 }
                 
-            case .failure(let error):
-                print(error)
             }
-            
+        }
+        
+    }
+    
+// MARK: - Debounce
+    
+    class Debounce {
+        
+        private let timeInterval: TimeInterval
+        private let queue: DispatchQueue
+        private var dispatchWorkItem = DispatchWorkItem(block: {})
+        
+        init(timeInterval: TimeInterval, queue: DispatchQueue) {
+            self.timeInterval = timeInterval
+            self.queue = queue
+        }
+        
+        func dispatch(_ block: @escaping () -> Void) {
+            dispatchWorkItem.cancel()
+            let workItem = DispatchWorkItem {
+                block()
+            }
+            dispatchWorkItem = workItem
+            queue.asyncAfter(deadline: .now() + timeInterval, execute: dispatchWorkItem)
         }
     }
+    
+// MARK: - Alert
+    
+
+    
+    
     
 //    func searchBarButton(searchBar: UISearchBar){
 //        print("\(searchBar.text ?? "")")
