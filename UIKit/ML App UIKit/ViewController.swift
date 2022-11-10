@@ -41,7 +41,7 @@ class ViewController: UIViewController, UITextFieldDelegate /* UISearchBarDelega
     
     private let networkManager: ServiceProtocol
     
-    private let debounce = Debounce(timeInterval: 2.5, queue: .global(qos: .userInitiated))
+//    private let debounce = Debounce(timeInterval: 2.5, queue: .global(qos: .userInitiated))
     
      
     // MARK: - Init
@@ -62,6 +62,8 @@ class ViewController: UIViewController, UITextFieldDelegate /* UISearchBarDelega
         setupNavBar()
         setupSearchBar()
         setupTableView()
+        
+        hideKeyboardWhenTappedAround()
         
     }
     
@@ -118,19 +120,26 @@ extension ViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell()
         cell.textLabel?.text = product.results[indexPath.row].title
+//        cell.textLabel?.text = product.results[indexPath.row].condition
+//        cell.textLabel?.text = String(product.results[indexPath.row].price)
+//        cell.textLabel?.text = product.results[indexPath.row].permalink
+//        cell.textLabel?.text = product.results[indexPath.row].thumbnail
         return cell
     }
 }
 
 
 //  MARK: - Get data from searchbar
-    
+private var dispatchWorkItem: DispatchWorkItem?
+private let queue = DispatchQueue(label: "idk")
+
 extension ViewController: UISearchBarDelegate {
     
     public func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        debounce.dispatch {
+        dispatchWorkItem?.cancel()
+        let workItem = DispatchWorkItem {
             print("\(searchText)")
-            self.networkManager.fetchData(for: "https://api.mercadolibre.com/sites/MLM/search?q=iphone") { result in
+            self.networkManager.fetchData(for: "https://api.mercadolibre.com/sites/MLM/search?q=\(searchText)") { result in
                 switch result {
                 case .success(let data):
                     
@@ -141,44 +150,52 @@ extension ViewController: UISearchBarDelegate {
                     
                 case .failure(let error):
                     print(error)
+                    print("something failed")
                 }
                 
             }
         }
+        dispatchWorkItem = workItem
+        queue.asyncAfter(deadline: .now() + 2.5, execute: dispatchWorkItem!)
         
     }
-    
+}
 // MARK: - Debounce
     
-    class Debounce {
-        
-        private let timeInterval: TimeInterval
-        private let queue: DispatchQueue
-        private var dispatchWorkItem = DispatchWorkItem(block: {})
-        
-        init(timeInterval: TimeInterval, queue: DispatchQueue) {
-            self.timeInterval = timeInterval
-            self.queue = queue
-        }
-        
-        func dispatch(_ block: @escaping () -> Void) {
-            dispatchWorkItem.cancel()
-            let workItem = DispatchWorkItem {
-                block()
-            }
-            dispatchWorkItem = workItem
-            queue.asyncAfter(deadline: .now() + timeInterval, execute: dispatchWorkItem)
-        }
-    }
-    
-// MARK: - Alert
-    
-
-    
-    
-    
-//    func searchBarButton(searchBar: UISearchBar){
-//        print("\(searchBar.text ?? "")")
+//class Debounce {
+//    
+//    private let timeInterval: TimeInterval
+//    private let queue: DispatchQueue
+//    private var dispatchWorkItem = DispatchWorkItem(block: {})
+//    
+//    init(timeInterval: TimeInterval, queue: DispatchQueue) {
+//        self.timeInterval = timeInterval
+//        self.queue = queue
 //    }
-}
+//    
+//    func dispatch(_ block: @escaping () -> Void) {
+//        dispatchWorkItem.cancel()
+//        let workItem = DispatchWorkItem {
+//            block()
+//        }
+//        dispatchWorkItem = workItem
+//        queue.asyncAfter(deadline: .now() + timeInterval, execute: dispatchWorkItem)
+//    }
+//}
 
+// MARK: - Alert
+
+
+// MARK: - Hide Keyboard
+
+extension UIViewController {
+    func hideKeyboardWhenTappedAround() {
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIViewController.dismissKeyboard))
+        tap.cancelsTouchesInView = false
+        view.addGestureRecognizer(tap)
+    }
+
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
+    }
+}

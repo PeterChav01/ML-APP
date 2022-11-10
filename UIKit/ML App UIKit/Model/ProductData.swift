@@ -13,7 +13,7 @@ struct Product: Decodable  {
 
 struct ProductDetail: Decodable {
     let title: String
-    let price: Float
+    let price: Double
     let condition: String
     let thumbnail: String
     let permalink: String
