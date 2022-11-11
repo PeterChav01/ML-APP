@@ -7,16 +7,11 @@
 
 import UIKit
 
+/// 1. ARC -  > Automatic Reference Counting
+/// 2. Strong v Weak v Unowned
 class ViewController: UIViewController, UITextFieldDelegate /* UISearchBarDelegate */ {
+   
     // MARK: - UI Components
-    /*
-    private lazy var searchBar: UITextField = {
-        let searchBar = UITextField()
-        searchBar.translatesAutoresizingMaskIntoConstraints = false
-        return searchBar
-    }()
-    */
-    
     
     private lazy var searchBar: UISearchBar = {
         let searchBar = UISearchBar()
@@ -34,15 +29,12 @@ class ViewController: UIViewController, UITextFieldDelegate /* UISearchBarDelega
         return table
     }()
     
-    
-
-    
-    private let table = UITableView()
-    
     private let networkManager: ServiceProtocol
+
+    var product = Product(results: [])
     
-//    private let debounce = Debounce(timeInterval: 2.5, queue: .global(qos: .userInitiated))
-    
+    private var dispatchWorkItem: DispatchWorkItem?
+    private let queue = DispatchQueue(label: "idk")
      
     // MARK: - Init
     init(networkMananager: ServiceProtocol) {
@@ -51,12 +43,16 @@ class ViewController: UIViewController, UITextFieldDelegate /* UISearchBarDelega
         view.backgroundColor = .white
     }
     
+    deinit {
+        print("saliendo por la puerta")
+    }
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    var product = Product(results: [])
-    
+
+
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupNavBar()
@@ -66,6 +62,9 @@ class ViewController: UIViewController, UITextFieldDelegate /* UISearchBarDelega
         hideKeyboardWhenTappedAround()
         
     }
+    
+    
+// MARK: - Functions
     
     private func setupNavBar() {
         title = "MercadoLibre"
@@ -102,6 +101,19 @@ class ViewController: UIViewController, UITextFieldDelegate /* UISearchBarDelega
         
     }
     
+    private func reloadData(product: Product) {
+        DispatchQueue.main.async {
+            self.product = product
+            self.tableView.reloadData()
+        }
+    }
+    
+    func showAlert() {
+        let alert = UIAlertController(title: "Shit Happened", message: "Some Shit Happened", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Well...Shit", style: .default, handler: nil))
+        self.present(alert, animated: true, completion: nil)
+    }
+    
 }
 
 // MARK: - UITableViewDelegate
@@ -130,60 +142,41 @@ extension ViewController: UITableViewDataSource {
 
 
 //  MARK: - Get data from searchbar
-private var dispatchWorkItem: DispatchWorkItem?
-private let queue = DispatchQueue(label: "idk")
+
+
 
 extension ViewController: UISearchBarDelegate {
     
     public func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         dispatchWorkItem?.cancel()
-        let workItem = DispatchWorkItem {
+        let workItem = DispatchWorkItem { [weak self] in
+            
             print("\(searchText)")
-            self.networkManager.fetchData(for: "https://api.mercadolibre.com/sites/MLM/search?q=\(searchText)") { result in
+            self?.networkManager.fetchData(for: "https://api.mercadolibre.com/sites/MLM/search?q=\(searchText)") { result in
                 switch result {
-                case .success(let data):
-                    
-                    DispatchQueue.main.async {
-                        self.product = data
-                        self.tableView.reloadData()
-                    }
-                    
+                case .success(let data): self?.reloadData(product: data)
                 case .failure(let error):
                     print(error)
-                    print("something failed")
+                    print("error")
+                    
+                    DispatchQueue.main.async {
+                        self?.showAlert()
+                    }
                 }
-                
             }
         }
-        dispatchWorkItem = workItem
-        queue.asyncAfter(deadline: .now() + 2.5, execute: dispatchWorkItem!)
         
+        dispatchWorkItem = workItem
+        if let waitTime = dispatchWorkItem {
+            queue.asyncAfter(deadline: .now() + 2.5, execute: waitTime)
+        }
+
     }
 }
-// MARK: - Debounce
-    
-//class Debounce {
-//    
-//    private let timeInterval: TimeInterval
-//    private let queue: DispatchQueue
-//    private var dispatchWorkItem = DispatchWorkItem(block: {})
-//    
-//    init(timeInterval: TimeInterval, queue: DispatchQueue) {
-//        self.timeInterval = timeInterval
-//        self.queue = queue
-//    }
-//    
-//    func dispatch(_ block: @escaping () -> Void) {
-//        dispatchWorkItem.cancel()
-//        let workItem = DispatchWorkItem {
-//            block()
-//        }
-//        dispatchWorkItem = workItem
-//        queue.asyncAfter(deadline: .now() + timeInterval, execute: dispatchWorkItem)
-//    }
-//}
 
 // MARK: - Alert
+
+
 
 
 // MARK: - Hide Keyboard
@@ -199,3 +192,35 @@ extension UIViewController {
         view.endEditing(true)
     }
 }
+
+// {}
+
+//class ViewController2: UIViewController {
+//    
+//    override func viewDidLoad() {
+//        super.viewDidLoad()
+//        
+//        view.backgroundColor = .white
+//        
+//        let button = UIButton(type: .system)
+//        button.setTitle("Navegar a vista 2", for: .normal)
+//        button.translatesAutoresizingMaskIntoConstraints = false
+//        button.addTarget(self, action: #selector(navigateToViewController), for: .touchUpInside)
+//        view.addSubview(button)
+//        
+//        let constraints = [button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+//                           button.centerYAnchor.constraint(equalTo: view.centerYAnchor)]
+//        
+//        NSLayoutConstraint.activate(constraints)
+//        
+//    }
+//    
+//    @objc func navigateToViewController() {
+//        show(
+//            ViewController(
+//                networkMananager: NetworkManager()
+//            ),
+//            sender: nil
+//        )
+//    }
+//}

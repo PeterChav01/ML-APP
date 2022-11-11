@@ -22,6 +22,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         self.window = UIWindow(windowScene: scene)
         
+
         let navigationController = UINavigationController.init(
             rootViewController: ViewController(
                 networkMananager: NetworkManager()
