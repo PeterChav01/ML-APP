@@ -17,8 +17,10 @@ class NetworkManager: ServiceProtocol {
             URLSession.shared.dataTask(with: .init(url: url)) { data, response, error in
                 if data != nil && error == nil {
                     do {
-                        let fetchingData = try JSONDecoder().decode(Product.self, from: data!)
-                        completion(.success(fetchingData))
+                        if let safeData = data {
+                            let fetchingData = try JSONDecoder().decode(Product.self, from: safeData)
+                            completion(.success(fetchingData))
+                        }
                     } catch {
                         completion(.failure(error))
                     }

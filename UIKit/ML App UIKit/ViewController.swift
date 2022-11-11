@@ -7,9 +7,7 @@
 
 import UIKit
 
-/// 1. ARC -  > Automatic Reference Counting
-/// 2. Strong v Weak v Unowned
-class ViewController: UIViewController, UITextFieldDelegate /* UISearchBarDelegate */ {
+class ViewController: UIViewController, UITextFieldDelegate {
    
     // MARK: - UI Components
     
@@ -19,7 +17,6 @@ class ViewController: UIViewController, UITextFieldDelegate /* UISearchBarDelega
         searchBar.translatesAutoresizingMaskIntoConstraints = false
         return searchBar
     }()
-    
     
     private lazy var tableView: UITableView = {
         let table = UITableView()
@@ -31,10 +28,16 @@ class ViewController: UIViewController, UITextFieldDelegate /* UISearchBarDelega
     
     private let networkManager: ServiceProtocol
 
-    var product = Product(results: [])
+    private var product = Product(results: [])
     
     private var dispatchWorkItem: DispatchWorkItem?
     private let queue = DispatchQueue(label: "idk")
+    
+    enum Secwait: Double {
+        case secs = 2.5
+    }
+    
+    private let secToWait = Secwait.secs.rawValue
      
     // MARK: - Init
     init(networkMananager: ServiceProtocol) {
@@ -43,26 +46,16 @@ class ViewController: UIViewController, UITextFieldDelegate /* UISearchBarDelega
         view.backgroundColor = .white
     }
     
-    deinit {
-        print("saliendo por la puerta")
-    }
-    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
-
 
     override func viewDidLoad() {
         super.viewDidLoad()
         setupNavBar()
         setupSearchBar()
         setupTableView()
-        
-        hideKeyboardWhenTappedAround()
-        
     }
-    
     
 // MARK: - Functions
     
@@ -71,16 +64,14 @@ class ViewController: UIViewController, UITextFieldDelegate /* UISearchBarDelega
     }
     
     private func setupSearchBar() {
-        // 1. Agregar search bar a la vista del viewcontroller
+
         view.addSubview(searchBar)
         searchBar.placeholder = "Buscar Producto"
         
-        // 2. Agregar constraints al search bar
-        // x, y, width, height
         let constraints: [NSLayoutConstraint] = [
-            searchBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor), // arriba
-            searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor), // izquierda
-            searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor) // derecha
+            searchBar.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            searchBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            searchBar.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ]
         
         NSLayoutConstraint.activate(constraints)
@@ -88,7 +79,6 @@ class ViewController: UIViewController, UITextFieldDelegate /* UISearchBarDelega
     
     private func setupTableView(){
         view.addSubview(tableView)
-        
         
         let constraints: [NSLayoutConstraint] = [
             tableView.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
@@ -113,17 +103,17 @@ class ViewController: UIViewController, UITextFieldDelegate /* UISearchBarDelega
         alert.addAction(UIAlertAction(title: "Well...Shit", style: .default, handler: nil))
         self.present(alert, animated: true, completion: nil)
     }
-    
 }
 
 // MARK: - UITableViewDelegate
+
 extension ViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-       // print(products[indexPath.row])
     }
 }
 
 // MARK: - UITableViewDataSource
+
 extension ViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return product.results.count
@@ -132,10 +122,6 @@ extension ViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell()
         cell.textLabel?.text = product.results[indexPath.row].title
-//        cell.textLabel?.text = product.results[indexPath.row].condition
-//        cell.textLabel?.text = String(product.results[indexPath.row].price)
-//        cell.textLabel?.text = product.results[indexPath.row].permalink
-//        cell.textLabel?.text = product.results[indexPath.row].thumbnail
         return cell
     }
 }
@@ -143,22 +129,16 @@ extension ViewController: UITableViewDataSource {
 
 //  MARK: - Get data from searchbar
 
-
-
 extension ViewController: UISearchBarDelegate {
     
     public func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         dispatchWorkItem?.cancel()
         let workItem = DispatchWorkItem { [weak self] in
             
-            print("\(searchText)")
             self?.networkManager.fetchData(for: "https://api.mercadolibre.com/sites/MLM/search?q=\(searchText)") { result in
                 switch result {
                 case .success(let data): self?.reloadData(product: data)
-                case .failure(let error):
-                    print(error)
-                    print("error")
-                    
+                case .failure:
                     DispatchQueue.main.async {
                         self?.showAlert()
                     }
@@ -168,59 +148,7 @@ extension ViewController: UISearchBarDelegate {
         
         dispatchWorkItem = workItem
         if let waitTime = dispatchWorkItem {
-            queue.asyncAfter(deadline: .now() + 2.5, execute: waitTime)
+            queue.asyncAfter(deadline: .now() + secToWait, execute: waitTime)
         }
-
     }
 }
-
-// MARK: - Alert
-
-
-
-
-// MARK: - Hide Keyboard
-
-extension UIViewController {
-    func hideKeyboardWhenTappedAround() {
-        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(UIViewController.dismissKeyboard))
-        tap.cancelsTouchesInView = false
-        view.addGestureRecognizer(tap)
-    }
-
-    @objc func dismissKeyboard() {
-        view.endEditing(true)
-    }
-}
-
-// {}
-
-//class ViewController2: UIViewController {
-//    
-//    override func viewDidLoad() {
-//        super.viewDidLoad()
-//        
-//        view.backgroundColor = .white
-//        
-//        let button = UIButton(type: .system)
-//        button.setTitle("Navegar a vista 2", for: .normal)
-//        button.translatesAutoresizingMaskIntoConstraints = false
-//        button.addTarget(self, action: #selector(navigateToViewController), for: .touchUpInside)
-//        view.addSubview(button)
-//        
-//        let constraints = [button.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-//                           button.centerYAnchor.constraint(equalTo: view.centerYAnchor)]
-//        
-//        NSLayoutConstraint.activate(constraints)
-//        
-//    }
-//    
-//    @objc func navigateToViewController() {
-//        show(
-//            ViewController(
-//                networkMananager: NetworkManager()
-//            ),
-//            sender: nil
-//        )
-//    }
-//}

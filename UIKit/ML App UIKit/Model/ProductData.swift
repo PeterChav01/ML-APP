@@ -19,17 +19,6 @@ struct ProductDetail: Decodable {
     let permalink: String
 }
 
-/*
-struct Pokemon: Decodable {
-    var results: [PokemonDetail]
-}
-
-struct PokemonDetail: Decodable {
-    let name: String
-    let url: String
-}
-*/
-
 
 
 
