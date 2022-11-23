@@ -23,6 +23,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
         table.translatesAutoresizingMaskIntoConstraints = false
         table.delegate = self
         table.dataSource = self
+        table.register(CustomCell.self, forCellReuseIdentifier: "CustomCell")
         return table
     }()
     
@@ -120,12 +121,28 @@ extension ViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell()
-        cell.textLabel?.text = product.results[indexPath.row].title
+        let cell = tableView.dequeueReusableCell(withIdentifier: "CustomCell", for: indexPath) as! CustomCell
+        let model = product.results[indexPath.row]
+        
+        let productCellModel = ProductCellModel(model: model)
+        
+        cell.configure(model: productCellModel)
+        
+        //var listContentConfiguration = UIListContentConfiguration.cell()
+        //listContentConfiguration.text = model.title
+        //listContentConfiguration.secondaryText = "$ \(model.price)" String(model.price)
+        //listContentConfiguration.secondaryText = model.condition
+        //listContentConfiguration.text = model.thumbnail
+        //cell.contentConfiguration = listContentConfiguration
+        
         return cell
+        
+        
+//        let cell = UITableViewCell()
+//        cell.textLabel?.text = product.results[indexPath.row].title
+//        return cell
     }
 }
-
 
 //  MARK: - Get data from searchbar
 
