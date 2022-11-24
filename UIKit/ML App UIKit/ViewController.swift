@@ -24,6 +24,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
         table.delegate = self
         table.dataSource = self
         table.register(CustomCell.self, forCellReuseIdentifier: "CustomCell")
+        table.rowHeight = 130 //UITableView.automaticDimension
         return table
     }()
     
@@ -35,7 +36,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
     private let queue = DispatchQueue(label: "idk")
     
     enum Secwait: Double {
-        case secs = 2.5
+        case secs = 1.5
     }
     
     private let secToWait = Secwait.secs.rawValue
@@ -85,7 +86,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
             tableView.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
             tableView.leadingAnchor.constraint(equalTo: searchBar.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: searchBar.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
         ]
         
         NSLayoutConstraint.activate(constraints)

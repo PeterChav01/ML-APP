@@ -19,8 +19,8 @@ struct ProductCellModel {
     
     init(model: ProductDetail) {
         title = model.title
-        price = String(model.price)
-        condition = model.condition
+        price = "$ \(model.price) MXN"
+        condition = "Condición: \(model.condition)"
         thumbnail = URL(string: model.thumbnail)
     }
     
