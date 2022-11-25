@@ -24,7 +24,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
         table.delegate = self
         table.dataSource = self
         table.register(CustomCell.self, forCellReuseIdentifier: "CustomCell")
-        table.rowHeight = 130 //UITableView.automaticDimension
+        table.estimatedRowHeight = UITableView.automaticDimension
         return table
     }()
     
@@ -122,11 +122,12 @@ extension ViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CustomCell", for: indexPath) as! CustomCell
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: "CustomCell", for: indexPath) as? CustomCell else {
+            return UITableViewCell()
+        }
+        
         let model = product.results[indexPath.row]
-        
         let productCellModel = ProductCellModel(model: model)
-        
         cell.configure(model: productCellModel)
         
         //var listContentConfiguration = UIListContentConfiguration.cell()

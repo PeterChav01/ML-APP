@@ -11,8 +11,9 @@ class CustomCell: UITableViewCell {
     // MARK: - CellComponents
 
     private let productImageView: UIImageView = {
-        let imageView = UIImageView()
+        let imageView = UIImageView(image: .init(systemName: "bag.fill"))
         imageView.contentMode = .scaleAspectFit
+        imageView.clipsToBounds = true
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
     }()
@@ -41,29 +42,20 @@ class CustomCell: UITableViewCell {
     
     // MARK: - Init
     
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
-        
-        setupImageView()
-        setupTitle()
-        setupPrice()
-        setupCondition()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
     // MARK: - CellSetup
     
     private func setupImageView() {
         contentView.addSubview(productImageView)
         
         let constraints: [NSLayoutConstraint] = [
-            productImageView.heightAnchor.constraint(equalToConstant: 110),
-            productImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5),
-            productImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5),
+            productImageView.topAnchor.constraint(greaterThanOrEqualTo: contentView.topAnchor, constant: 10),
+            productImageView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -10),
             productImageView.widthAnchor.constraint(equalToConstant: 120),
+            productImageView.heightAnchor.constraint(equalTo: productImageView.widthAnchor, multiplier: productImageView.aspectRatio),
+            //productImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5),
+            productImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5),
+            productImageView.centerYAnchor.constraint(equalTo: centerYAnchor)
+            //productImageView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -5)
         ]
         
         NSLayoutConstraint.activate(constraints)
@@ -73,7 +65,7 @@ class CustomCell: UITableViewCell {
         contentView.addSubview(productTitle)
         
         let constraints: [NSLayoutConstraint] = [
-            productTitle.topAnchor.constraint(equalTo: topAnchor, constant: 5),
+            productTitle.topAnchor.constraint(equalTo: productImageView.topAnchor, constant: 5),
             productTitle.leadingAnchor.constraint(equalTo: productImageView.trailingAnchor, constant: 5),
             productTitle.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
         ]
@@ -99,19 +91,26 @@ class CustomCell: UITableViewCell {
         let constraints: [NSLayoutConstraint] = [
             productCondition.topAnchor.constraint(equalTo: productPrice.bottomAnchor,constant: 5),
             productCondition.leadingAnchor.constraint(equalTo: productImageView.trailingAnchor, constant: 5),
-            productCondition.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10)
+            productCondition.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
+            //productCondition.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -10)
         ]
         
         NSLayoutConstraint.activate(constraints)
     }
     
     // MARK: - Configure Cell
-
+//    {
+//
+//    }
     func configure(model: ProductCellModel) {
-        productImageView.load(url: model.thumbnail)
         productTitle.text = model.title
         productPrice.text = model.price
         productCondition.text = model.condition
+        productImageView.load(url: model.thumbnail)
+        setupImageView()
+        setupTitle()
+        setupPrice()
+        setupCondition()
     }
 
 }

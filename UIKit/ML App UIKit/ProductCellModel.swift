@@ -7,7 +7,10 @@
 
 import Foundation
 
-
+//let largeNumber: ProductDetail.
+//let numberFormatter = NumberFormatter()
+//numberFormatter.numberStyle = .decimal
+//let formattedNumber = numberFormatter.string(from: NSNumber(value:largeNumber))
 
 struct ProductCellModel {
     
@@ -24,6 +27,11 @@ struct ProductCellModel {
         thumbnail = URL(string: model.thumbnail)
     }
     
-    
-    
+//    private func formatNumber(number: Double) -> String {
+//        let largeNumber = number
+//        let numberFormatter = NumberFormatter()
+//        numberFormatter.numberStyle = .decimal
+//        let formatedNumber = numberFormatter.string(from: NSNumber(value: largeNumber))!
+//        return formatedNumber
+//    }
 }

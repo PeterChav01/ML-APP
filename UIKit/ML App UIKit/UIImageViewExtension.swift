@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 extension UIImageView {
-    func load(url: URL?) {
+    func load(url: URL?, completion: (() -> Void)? = nil) {
         guard let url = url else {
             return
         }
@@ -18,9 +18,20 @@ extension UIImageView {
                let image = UIImage(data: data) {
                 DispatchQueue.main.async {
                     self.image = image
+                    completion?()
                 }
             }
         }
         .resume()
     }
+ 
+    var aspectRatio: CGFloat {
+        guard let image = self.image,
+              image.size.width > 0 else {
+            return 0
+        }
+        return image.size.height / image.size.width
+    }
+    
+    
 }
