@@ -20,8 +20,10 @@ class CustomCell: UITableViewCell {
     
     private let productTitle: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 16, weight: .bold)
-        label.numberOfLines = 0
+        label.font = .systemFont(ofSize: 18, weight: .bold)
+        label.numberOfLines = 3
+        label.textAlignment = .left
+        label.adjustsFontSizeToFitWidth = true
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -51,7 +53,7 @@ class CustomCell: UITableViewCell {
             productImageView.topAnchor.constraint(greaterThanOrEqualTo: contentView.topAnchor, constant: 10),
             productImageView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -10),
             productImageView.widthAnchor.constraint(equalToConstant: 120),
-            productImageView.heightAnchor.constraint(equalTo: productImageView.widthAnchor, multiplier: productImageView.aspectRatio),
+            productImageView.heightAnchor.constraint(equalToConstant: 120),
             //productImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5),
             productImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5),
             productImageView.centerYAnchor.constraint(equalTo: centerYAnchor)
