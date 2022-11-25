@@ -11,7 +11,7 @@ class CustomViewCell: UITableViewCell {
     // MARK: - CellComponents
 
     private let productImageView: UIImageView = {
-        let imageView = UIImageView(image: .init(systemName: "bag.fill"))
+        let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
         imageView.clipsToBounds = true
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -113,9 +113,9 @@ class CustomViewCell: UITableViewCell {
         contentView.addSubview(productCondition)
         
         let constraints: [NSLayoutConstraint] = [
-            productCondition.topAnchor.constraint(equalTo: productPrice.bottomAnchor,constant: 5),
-            productCondition.leadingAnchor.constraint(equalTo: productImageView.trailingAnchor, constant: 5),
-            productCondition.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
+            productCondition.topAnchor.constraint(equalTo: productPrice.bottomAnchor,constant: Constants.topView.rawValue),
+            productCondition.leadingAnchor.constraint(equalTo: productImageView.trailingAnchor, constant: Constants.topView.rawValue),
+            productCondition.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: Constants.trailingView.rawValue),
         ]
         
         NSLayoutConstraint.activate(constraints)

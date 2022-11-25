@@ -13,7 +13,6 @@ struct ProductCellModel {
     let price: String
     let condition: String
     let thumbnail: URL?
-    //let permalink: String
     
     init(model: ProductDetail) {
         title = model.title
@@ -21,12 +20,4 @@ struct ProductCellModel {
         condition = "Condición: \(model.condition)"
         thumbnail = URL(string: model.thumbnail)
     }
-    
-//    private func formatNumber(number: Double) -> String {
-//        let largeNumber = number
-//        let numberFormatter = NumberFormatter()
-//        numberFormatter.numberStyle = .decimal
-//        let formatedNumber = numberFormatter.string(from: NSNumber(value: largeNumber))!
-//        return formatedNumber
-//    }
 }
