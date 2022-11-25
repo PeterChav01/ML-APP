@@ -7,11 +7,6 @@
 
 import Foundation
 
-//let largeNumber: ProductDetail.
-//let numberFormatter = NumberFormatter()
-//numberFormatter.numberStyle = .decimal
-//let formattedNumber = numberFormatter.string(from: NSNumber(value:largeNumber))
-
 struct ProductCellModel {
     
     let title: String

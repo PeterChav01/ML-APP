@@ -23,10 +23,12 @@ class ViewController: UIViewController, UITextFieldDelegate {
         table.translatesAutoresizingMaskIntoConstraints = false
         table.delegate = self
         table.dataSource = self
-        table.register(CustomCell.self, forCellReuseIdentifier: "CustomCell")
+        table.register(CustomViewCell.self, forCellReuseIdentifier: identifier)
         table.estimatedRowHeight = UITableView.automaticDimension
         return table
     }()
+    
+    private let identifier: String = "CustomViewCell"
     
     private let networkManager: ServiceProtocol
 
@@ -38,9 +40,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
     enum Secwait: Double {
         case secs = 1.5
     }
-    
-    private let secToWait = Secwait.secs.rawValue
-     
+         
     // MARK: - Init
     init(networkMananager: ServiceProtocol) {
         self.networkManager = networkMananager
@@ -122,7 +122,7 @@ extension ViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "CustomCell", for: indexPath) as? CustomCell else {
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath) as? CustomViewCell else {
             return UITableViewCell()
         }
         
@@ -130,19 +130,7 @@ extension ViewController: UITableViewDataSource {
         let productCellModel = ProductCellModel(model: model)
         cell.configure(model: productCellModel)
         
-        //var listContentConfiguration = UIListContentConfiguration.cell()
-        //listContentConfiguration.text = model.title
-        //listContentConfiguration.secondaryText = "$ \(model.price)" String(model.price)
-        //listContentConfiguration.secondaryText = model.condition
-        //listContentConfiguration.text = model.thumbnail
-        //cell.contentConfiguration = listContentConfiguration
-        
         return cell
-        
-        
-//        let cell = UITableViewCell()
-//        cell.textLabel?.text = product.results[indexPath.row].title
-//        return cell
     }
 }
 
@@ -167,7 +155,7 @@ extension ViewController: UISearchBarDelegate {
         
         dispatchWorkItem = workItem
         if let waitTime = dispatchWorkItem {
-            queue.asyncAfter(deadline: .now() + secToWait, execute: waitTime)
+            queue.asyncAfter(deadline: .now() + Secwait.secs.rawValue, execute: waitTime)
         }
     }
 }
