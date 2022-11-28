@@ -16,9 +16,5 @@ struct ProductDetail: Decodable {
     let price: Double
     let condition: String
     let thumbnail: String
-    let permalink: String
+    //let permalink: String
 }
-
-
-
-

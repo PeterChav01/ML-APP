@@ -23,8 +23,12 @@ class ViewController: UIViewController, UITextFieldDelegate {
         table.translatesAutoresizingMaskIntoConstraints = false
         table.delegate = self
         table.dataSource = self
+        table.register(CustomViewCell.self, forCellReuseIdentifier: identifier)
+        table.estimatedRowHeight = UITableView.automaticDimension
         return table
     }()
+    
+    private let identifier: String = "CustomViewCell"
     
     private let networkManager: ServiceProtocol
 
@@ -34,11 +38,9 @@ class ViewController: UIViewController, UITextFieldDelegate {
     private let queue = DispatchQueue(label: "idk")
     
     enum Secwait: Double {
-        case secs = 2.5
+        case secs = 1.5
     }
-    
-    private let secToWait = Secwait.secs.rawValue
-     
+         
     // MARK: - Init
     init(networkMananager: ServiceProtocol) {
         self.networkManager = networkMananager
@@ -84,7 +86,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
             tableView.topAnchor.constraint(equalTo: searchBar.bottomAnchor),
             tableView.leadingAnchor.constraint(equalTo: searchBar.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: searchBar.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
         ]
         
         NSLayoutConstraint.activate(constraints)
@@ -120,12 +122,17 @@ extension ViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell()
-        cell.textLabel?.text = product.results[indexPath.row].title
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath) as? CustomViewCell else {
+            return UITableViewCell()
+        }
+        
+        let model = product.results[indexPath.row]
+        let productCellModel = ProductCellModel(model: model)
+        cell.configure(model: productCellModel)
+        
         return cell
     }
 }
-
 
 //  MARK: - Get data from searchbar
 
@@ -148,7 +155,7 @@ extension ViewController: UISearchBarDelegate {
         
         dispatchWorkItem = workItem
         if let waitTime = dispatchWorkItem {
-            queue.asyncAfter(deadline: .now() + secToWait, execute: waitTime)
+            queue.asyncAfter(deadline: .now() + Secwait.secs.rawValue, execute: waitTime)
         }
     }
 }
