@@ -14,7 +14,7 @@ struct ProductCellModel {
     let condition: String
     let thumbnail: URL?
     
-    init(model: ProductDetail) {
+    init(model: ProductResult) {
         title = model.title
         price = "$ \(model.price) MXN"
         condition = "Condición: \(model.condition)"

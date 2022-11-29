@@ -31,7 +31,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
     private let identifier: String = "CustomViewCell"
     
     private let networkManager: ServiceProtocol
-    private var product = Product(results: [])
+    private var product = SearchResults(results: [])
     
     private var dispatchWorkItem: DispatchWorkItem?
     private let queue = DispatchQueue(label: "idk")
@@ -92,7 +92,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
         
     }
     
-    private func reloadData(product: Product) {
+    private func reloadData(product: SearchResults) {
         DispatchQueue.main.async {
             self.product = product
             self.tableView.reloadData()

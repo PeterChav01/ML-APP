@@ -7,11 +7,11 @@
 
 import Foundation
 
-struct ItemData: Decodable {
+struct ProductDetail: Decodable {
     let id: String
     let title: String
     let price: Double
     let condition: String
-    let pictures: 
+    let pictures: [String]
     
 }
