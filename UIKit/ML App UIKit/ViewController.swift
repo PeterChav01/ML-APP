@@ -27,11 +27,10 @@ class ViewController: UIViewController, UITextFieldDelegate {
         table.estimatedRowHeight = UITableView.automaticDimension
         return table
     }()
-    
+        
     private let identifier: String = "CustomViewCell"
     
     private let networkManager: ServiceProtocol
-
     private var product = Product(results: [])
     
     private var dispatchWorkItem: DispatchWorkItem?
@@ -105,12 +104,17 @@ class ViewController: UIViewController, UITextFieldDelegate {
         alert.addAction(UIAlertAction(title: "Well...Shit", style: .default, handler: nil))
         self.present(alert, animated: true, completion: nil)
     }
+
 }
 
 // MARK: - UITableViewDelegate
 
 extension ViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let id = product.results[indexPath.row].id
+        let productDetailViewController = ProductDetailScreenViewController(productId: id)
+        navigationController?.pushViewController(productDetailViewController, animated: true)
+        
     }
 }
 
