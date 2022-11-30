@@ -12,32 +12,45 @@ class ProductDetailScreenViewController: UIViewController {
 
     private lazy var labelTitle: UILabel = {
         let label = UILabel()
-        label.textColor = .white
+        label.textColor = Constants.Title.color
         label.text = productId
-        label.font = .systemFont(ofSize: 20, weight: .bold)
+        label.font = .systemFont(ofSize: Constants.Title.size, weight: .bold)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     private lazy var labelPrice: UILabel = {
         let label = UILabel()
-        label.textColor = .white
+        label.textColor = Constants.Title.color
         label.text = "Precio: $ \(productId)"
-        label.font = .systemFont(ofSize: 20, weight: .bold)
+        label.font = .systemFont(ofSize: Constants.Title.size, weight: .bold)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     private lazy var labelCondition: UILabel = {
         let label = UILabel()
-        label.textColor = .white
+        label.textColor = Constants.Title.color
         label.text = "Condicion: \(productId)"
-        label.font = .systemFont(ofSize: 20, weight: .bold)
+        label.font = .systemFont(ofSize: Constants.Title.size, weight: .bold)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     private var productId: String = ""
+    
+    struct Constants {
+        
+        struct Title {
+            static let size: CGFloat = 20
+            static let color: UIColor = .white
+        }
+        
+        struct Constraints {
+            static let top: CGFloat = 20
+            static let centerY: CGFloat = 100
+        }
+    }
     
     // MARK: - Init
     
@@ -67,7 +80,7 @@ class ProductDetailScreenViewController: UIViewController {
         
         let constraints: [NSLayoutConstraint] = [
             labelTitle.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
-            labelTitle.centerYAnchor.constraint(equalTo: self.view.centerYAnchor, constant: 100),
+            labelTitle.centerYAnchor.constraint(equalTo: self.view.centerYAnchor, constant: Constants.Constraints.centerY),
         ]
         
         NSLayoutConstraint.activate(constraints)
@@ -77,7 +90,7 @@ class ProductDetailScreenViewController: UIViewController {
         view.addSubview(labelPrice)
         
         let constraints: [NSLayoutConstraint] = [
-            labelPrice.topAnchor.constraint(equalTo: labelTitle.bottomAnchor, constant: 20),
+            labelPrice.topAnchor.constraint(equalTo: labelTitle.bottomAnchor, constant: Constants.Constraints.top),
             labelPrice.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
         ]
         
@@ -88,12 +101,10 @@ class ProductDetailScreenViewController: UIViewController {
         view.addSubview(labelCondition)
         
         let constraints: [NSLayoutConstraint] = [
-            labelCondition.topAnchor.constraint(equalTo: labelPrice.bottomAnchor, constant: 20),
+            labelCondition.topAnchor.constraint(equalTo: labelPrice.bottomAnchor, constant: Constants.Constraints.top),
             labelCondition.centerXAnchor.constraint(equalTo: self.view.centerXAnchor)
         ]
         
         NSLayoutConstraint.activate(constraints)
     }
-    
-    
 }
