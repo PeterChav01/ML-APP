@@ -24,7 +24,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
 
         let navigationController = UINavigationController.init(
-            rootViewController: ViewController(
+            rootViewController: ResultsScreenView(
                 networkMananager: NetworkManager()
             )
         )

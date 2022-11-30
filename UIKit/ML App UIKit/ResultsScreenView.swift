@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ViewController: UIViewController, UITextFieldDelegate {
+class ResultsScreenView: UIViewController, UITextFieldDelegate {
    
     // MARK: - UI Components
     
@@ -109,7 +109,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
 
     // MARK: - UITableViewDelegate
 
-    extension ViewController: UITableViewDelegate {
+    extension ResultsScreenView: UITableViewDelegate {
         func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
             let id = product.results[indexPath.row].id
             let productDetailViewController = ProductDetailScreenViewController(productId: id)
@@ -120,7 +120,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
 
     // MARK: - UITableViewDataSource
 
-    extension ViewController: UITableViewDataSource {
+    extension ResultsScreenView: UITableViewDataSource {
         func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
             return product.results.count
         }
@@ -140,12 +140,12 @@ class ViewController: UIViewController, UITextFieldDelegate {
 
         //  MARK: - Get data from searchbar
 
-    extension ViewController: UISearchBarDelegate {
+    extension ResultsScreenView: UISearchBarDelegate {
         
         public func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
             dispatchWorkItem?.cancel()
             let workItem = DispatchWorkItem { [weak self] in
-                self?.networkManager.fetchResultData(for: searchText) { result in
+                self?.networkManager.queryResult(for: searchText) { result in
                     switch result {
                     case .success(let data): self?.reloadData(product: data)
                     case .failure:
