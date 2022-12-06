@@ -13,5 +13,8 @@ struct ProductDetail: Decodable {
     let price: Double
     let condition: String
     let pictures: [String]
-    
+}
+
+struct ProductImages:  {
+    let pictures: [URL]
 }
