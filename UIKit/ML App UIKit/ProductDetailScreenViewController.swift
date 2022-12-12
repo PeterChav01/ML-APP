@@ -39,12 +39,11 @@ class ProductDetailScreenViewController: UIViewController {
     }()
     
     var carouselData: [CarouselData] = [
-        CarouselData(image: UIImage(systemName: "iphone"), text: "iphone"),
         CarouselData(image: UIImage(systemName: "macmini"), text: "macmini"),
         CarouselData(image: UIImage(systemName: "applewatch"), text: "applewatch")
     ]
     
-    private var productId: String = ""
+    private let productId: String
     
     struct CarouselData  {
         let image: UIImage?
@@ -68,10 +67,25 @@ class ProductDetailScreenViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        fetchProductDetail()
         view.backgroundColor = .white
         print(productId)
         configureView(with: carouselData)
         setupTitleLabel()
+        
+        
+    }
+    
+    func fetchProductDetail() {
+        let networkManager = NetworkManager()
+        networkManager.fetchProductDetail(for: productId) {
+            switch $0 {
+            case .success(let model):
+                print(model)
+            case .failure(let error):
+                print(error)
+            }
+        }
     }
     
     func configureView(with data: [CarouselData]) {

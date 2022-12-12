@@ -12,9 +12,16 @@ struct ProductDetail: Decodable {
     let title: String
     let price: Double
     let condition: String
-    let pictures: [String]
+    let pictures: [PictureModel]
 }
 
-struct ProductImages:  {
-    let pictures: [URL]
+struct PictureModel: Decodable {
+    let url: URL
+    
+    private enum CodingKeys: String, CodingKey {
+        case url = "secure_url"
+    }
 }
+
+
+

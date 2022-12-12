@@ -55,5 +55,7 @@ extension CarouselCell {
     public func configure(image: UIImage?) {
         imageView.image = image
     }
+    
+    
 }
 
