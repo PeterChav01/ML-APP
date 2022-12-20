@@ -52,8 +52,8 @@ private extension CarouselCell {
 }
 
 extension CarouselCell {
-    public func configure(image: UIImage?) {
-        imageView.image = image
+    public func configure(url: URL?) {
+        imageView.load(url: url)
     }
     
     

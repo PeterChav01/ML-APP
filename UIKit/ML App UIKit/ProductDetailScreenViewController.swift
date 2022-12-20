@@ -13,7 +13,7 @@ class ProductDetailScreenViewController: UIViewController {
     private lazy var carouselCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
-        layout.itemSize = .init(width: 300, height: 300)
+        layout.itemSize = .init(width: Constants.CollectionView.width, height: Constants.CollectionView.height)
         layout.sectionInset = .zero
         
         let collection = UICollectionView(frame: .zero, collectionViewLayout: layout)
@@ -28,9 +28,8 @@ class ProductDetailScreenViewController: UIViewController {
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = productId
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.font = .systemFont(ofSize: 30, weight: .bold)
+        label.font = .systemFont(ofSize: Constants.Label.fontSize, weight: .bold)
         label.textColor = .black
         label.textAlignment = .center
         label.numberOfLines = 3
@@ -38,26 +37,58 @@ class ProductDetailScreenViewController: UIViewController {
         return label
     }()
     
-    var carouselData: [CarouselData] = [
-        CarouselData(image: UIImage(systemName: "macmini"), text: "macmini"),
-        CarouselData(image: UIImage(systemName: "applewatch"), text: "applewatch")
-    ]
+    private lazy var priceLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = .systemFont(ofSize: Constants.Label.fontSize)
+        label.textColor = .black
+        label.textAlignment = .center
+        label.numberOfLines = Constants.Label.numberOfLines
+        label.adjustsFontSizeToFitWidth = true
+        return label
+    }()
     
+    private lazy var conditionLabel: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = .systemFont(ofSize: Constants.Label.fontSize)
+        label.textColor = .black
+        label.textAlignment = .center
+        label.numberOfLines = Constants.Label.numberOfLines
+        label.adjustsFontSizeToFitWidth = true
+        return label
+    }()
+        
     private let productId: String
     
-    struct CarouselData  {
-        let image: UIImage?
-        let text: String
-    }
+    private var modelDetail: ProductDetail?
+
+    private let networkManager: NetworkManager
     
     struct Constants {
     
+        struct CollectionView {
+            static let width = 300
+            static let height = 300
+        }
+        
+        struct Label {
+            static let fontSize: CGFloat = 30
+            static let numberOfLines = 3
+        }
+        
+        struct Constraints {
+            static let width: CGFloat = 300
+            static let height: CGFloat = 300
+            static let top: CGFloat = 30
+        }
     }
     
     // MARK: - Init
     
-    init(productId: String) {
+    init(productId: String, networkManager: NetworkManager) {
         self.productId = productId
+        self.networkManager = networkManager
         super.init(nibName: nil, bundle: nil)
     }    
     
@@ -67,37 +98,42 @@ class ProductDetailScreenViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        fetchProductDetail()
+        
         view.backgroundColor = .white
         print(productId)
-        configureView(with: carouselData)
+        fetchProductDetail()
+        configureView()
         setupTitleLabel()
-        
+        setupPriceLabel()
+        setupConditionLabel()
         
     }
     
     func fetchProductDetail() {
-        let networkManager = NetworkManager()
         networkManager.fetchProductDetail(for: productId) {
             switch $0 {
             case .success(let model):
-                print(model)
+                DispatchQueue.main.async { 
+                    self.modelDetail = model
+                    self.carouselCollectionView.reloadData()
+                    self.titleLabel.text = self.modelDetail?.title
+                    self.priceLabel.text = "$: \(self.modelDetail?.price ?? 0)"
+                    self.conditionLabel.text = "Condición: \(self.modelDetail?.condition ?? "")"
+                }
             case .failure(let error):
                 print(error)
             }
         }
     }
     
-    func configureView(with data: [CarouselData]) {
-        carouselData = data
+    func configureView() {
         view.addSubview(carouselCollectionView)
         
         let constraints: [NSLayoutConstraint] = [
-            carouselCollectionView.widthAnchor.constraint(equalToConstant: 300),
-            carouselCollectionView.heightAnchor.constraint(equalToConstant: 300),
+            carouselCollectionView.widthAnchor.constraint(equalToConstant: Constants.Constraints.width),
+            carouselCollectionView.heightAnchor.constraint(equalToConstant: Constants.Constraints.height),
             carouselCollectionView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            //carouselCollectionView.centerYAnchor.constraint(equalTo: view.centerYAnchor),
-            carouselCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 30)
+            carouselCollectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: Constants.Constraints.top)
         ]
         
         NSLayoutConstraint.activate(constraints)
@@ -108,9 +144,31 @@ class ProductDetailScreenViewController: UIViewController {
         view.addSubview(titleLabel)
         
         let constraints: [NSLayoutConstraint] = [
-            titleLabel.topAnchor.constraint(equalTo: carouselCollectionView.bottomAnchor, constant: 10),
-            titleLabel.widthAnchor.constraint(equalToConstant: 300),
+            titleLabel.topAnchor.constraint(equalTo: carouselCollectionView.bottomAnchor, constant: Constants.Constraints.top),
+            titleLabel.widthAnchor.constraint(equalToConstant: Constants.Constraints.width),
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ]
+        NSLayoutConstraint.activate(constraints)
+    }
+    
+    func setupPriceLabel() {
+        view.addSubview(priceLabel)
+        
+        let constraints: [NSLayoutConstraint] = [
+            priceLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: Constants.Constraints.top),
+            priceLabel.widthAnchor.constraint(equalToConstant: Constants.Constraints.width),
+            priceLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
+        ]
+        NSLayoutConstraint.activate(constraints)
+    }
+    
+    func setupConditionLabel() {
+        view.addSubview(conditionLabel)
+        
+        let constraints: [NSLayoutConstraint] = [
+            conditionLabel.topAnchor.constraint(equalTo: priceLabel.bottomAnchor, constant: Constants.Constraints.top),
+            conditionLabel.widthAnchor.constraint(equalToConstant: Constants.Constraints.width),
+            conditionLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor)
         ]
         NSLayoutConstraint.activate(constraints)
     }
@@ -125,13 +183,13 @@ extension ProductDetailScreenViewController: UICollectionViewDataSource{
     }
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return carouselData.count
+        return modelDetail?.pictures.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: CarouselCell.cellId, for: indexPath) as? CarouselCell else { return UICollectionViewCell() }
-        let model = carouselData[indexPath.row]
-        cell.configure(image: model.image)
+        let url = modelDetail?.pictures[indexPath.row].url
+        cell.configure(url: url)
         return cell
     }
 }

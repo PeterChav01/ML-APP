@@ -112,7 +112,7 @@ class ResultsScreenView: UIViewController, UITextFieldDelegate {
     extension ResultsScreenView: UITableViewDelegate {
         func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
             let id = product.results[indexPath.row].id
-            let productDetailViewController = ProductDetailScreenViewController(productId: id)
+            let productDetailViewController = ProductDetailScreenViewController(productId: id, networkManager: NetworkManager())
             navigationController?.pushViewController(productDetailViewController, animated: true)
         }
     }
