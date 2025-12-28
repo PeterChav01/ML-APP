@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ViewController: UIViewController, UITextFieldDelegate {
+class ResultsScreenView: UIViewController, UITextFieldDelegate {
    
     // MARK: - UI Components
     
@@ -27,12 +27,11 @@ class ViewController: UIViewController, UITextFieldDelegate {
         table.estimatedRowHeight = UITableView.automaticDimension
         return table
     }()
-    
+        
     private let identifier: String = "CustomViewCell"
     
     private let networkManager: ServiceProtocol
-
-    private var product = Product(results: [])
+    private var product = SearchResults(results: [])
     
     private var dispatchWorkItem: DispatchWorkItem?
     private let queue = DispatchQueue(label: "idk")
@@ -59,7 +58,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
         setupTableView()
     }
     
-// MARK: - Functions
+    // MARK: - Functions
     
     private func setupNavBar() {
         title = "MercadoLibre"
@@ -93,7 +92,7 @@ class ViewController: UIViewController, UITextFieldDelegate {
         
     }
     
-    private func reloadData(product: Product) {
+    private func reloadData(product: SearchResults) {
         DispatchQueue.main.async {
             self.product = product
             self.tableView.reloadData()
@@ -105,57 +104,60 @@ class ViewController: UIViewController, UITextFieldDelegate {
         alert.addAction(UIAlertAction(title: "Well...Shit", style: .default, handler: nil))
         self.present(alert, animated: true, completion: nil)
     }
+
 }
 
-// MARK: - UITableViewDelegate
+    // MARK: - UITableViewDelegate
 
-extension ViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+    extension ResultsScreenView: UITableViewDelegate {
+        func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+            let id = product.results[indexPath.row].id
+            let productDetailViewController = ProductDetailScreenViewController(productId: id, networkManager: NetworkManager())
+            navigationController?.pushViewController(productDetailViewController, animated: true)
+        }
     }
-}
 
-// MARK: - UITableViewDataSource
+    // MARK: - UITableViewDataSource
 
-extension ViewController: UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return product.results.count
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath) as? CustomViewCell else {
-            return UITableViewCell()
+    extension ResultsScreenView: UITableViewDataSource {
+        func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+            return product.results.count
         }
         
-        let model = product.results[indexPath.row]
-        let productCellModel = ProductCellModel(model: model)
-        cell.configure(model: productCellModel)
-        
-        return cell
-    }
-}
-
-//  MARK: - Get data from searchbar
-
-extension ViewController: UISearchBarDelegate {
-    
-    public func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        dispatchWorkItem?.cancel()
-        let workItem = DispatchWorkItem { [weak self] in
+        func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: identifier, for: indexPath) as? CustomViewCell else {
+                return UITableViewCell()
+            }
             
-            self?.networkManager.fetchData(for: "https://api.mercadolibre.com/sites/MLM/search?q=\(searchText)") { result in
-                switch result {
-                case .success(let data): self?.reloadData(product: data)
-                case .failure:
-                    DispatchQueue.main.async {
-                        self?.showAlert()
+            let model = product.results[indexPath.row]
+            let productCellModel = ProductCellModel(model: model)
+            cell.configure(model: productCellModel)
+            
+            return cell
+        }
+    }
+
+        //  MARK: - Get data from searchbar
+
+    extension ResultsScreenView: UISearchBarDelegate {
+        
+        public func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+            dispatchWorkItem?.cancel()
+            let workItem = DispatchWorkItem { [weak self] in
+                self?.networkManager.queryResult(for: searchText) { result in
+                    switch result {
+                    case .success(let data): self?.reloadData(product: data)
+                    case .failure:
+                        DispatchQueue.main.async {
+                            self?.showAlert()
+                        }
                     }
                 }
             }
-        }
-        
-        dispatchWorkItem = workItem
-        if let waitTime = dispatchWorkItem {
-            queue.asyncAfter(deadline: .now() + Secwait.secs.rawValue, execute: waitTime)
+            
+            dispatchWorkItem = workItem
+            if let waitTime = dispatchWorkItem {
+                queue.asyncAfter(deadline: .now() + Secwait.secs.rawValue, execute: waitTime)
+            }
         }
     }
-}

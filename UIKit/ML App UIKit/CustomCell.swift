@@ -8,6 +8,7 @@
 import UIKit
 
 class CustomViewCell: UITableViewCell {
+    
     // MARK: - CellComponents
 
     private let productImageView: UIImageView = {
@@ -20,8 +21,8 @@ class CustomViewCell: UITableViewCell {
     
     private let productTitle: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: Constants.labelTitleSize.rawValue, weight: .bold)
-        label.numberOfLines = LabelLines.labelLines.rawValue
+        label.font = .systemFont(ofSize: Constants.Title.titleFontSize, weight: .bold)
+        label.numberOfLines = Constants.Title.numberLines
         label.textAlignment = .left
         label.adjustsFontSizeToFitWidth = true
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -30,29 +31,57 @@ class CustomViewCell: UITableViewCell {
     
     private let productPrice: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: Constants.labelTitleSize.rawValue, weight: .medium)
+        label.font = .systemFont(ofSize: Constants.Labels.labelFontSize, weight: .medium)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
     
     private let productCondition: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: Constants.labelTitleSize.rawValue)
+        label.font = .systemFont(ofSize: Constants.Labels.labelFontSize)
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
+
+    //MARK: - Constants
     
-    enum Constants: CGFloat {
-        case topView = 5
-        case bottomView = -10
-        case heightWidth = 120
-        case leadingAnchor = 6
-        case trailingView = -11
-        case labelTitleSize = 18
-    }
-    
-    enum LabelLines: Int {
-        case labelLines = 3
+    struct Constants {
+        
+        struct Title {
+            static let titleFontSize: CGFloat = 18
+            static let numberLines: Int = 3
+        }
+        
+        struct Labels {
+            static let labelFontSize: CGFloat = 18
+        }
+        
+        struct ImageConstraints {
+            static let top: CGFloat = 5
+            static let bottom: CGFloat = -10
+            static let height: CGFloat = 120
+            static let width: CGFloat = 120
+            static let leading: CGFloat = 5
+            static let trailing: CGFloat = -10
+        }
+        
+        struct TitleLabel {
+            static let top: CGFloat = 5
+            static let leading: CGFloat = 5
+            static let trailing: CGFloat = -10
+        }
+        
+        struct PriceLabel {
+            static let top: CGFloat = 5
+            static let leading: CGFloat = 5
+            static let trailing: CGFloat = -10
+        }
+        
+        struct ConditionLabel {
+            static let top: CGFloat = 5
+            static let leading: CGFloat = 5
+            static let trailing: CGFloat = -10
+        }
     }
     
     // MARK: - Configure Cell
@@ -74,11 +103,11 @@ class CustomViewCell: UITableViewCell {
         contentView.addSubview(productImageView)
         
         let constraints: [NSLayoutConstraint] = [
-            productImageView.topAnchor.constraint(greaterThanOrEqualTo: contentView.topAnchor, constant: Constants.topView.rawValue),
-            productImageView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: Constants.bottomView.rawValue),
-            productImageView.widthAnchor.constraint(equalToConstant: Constants.heightWidth.rawValue),
-            productImageView.heightAnchor.constraint(equalToConstant: Constants.heightWidth.rawValue),
-            productImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.leadingAnchor.rawValue),
+            productImageView.topAnchor.constraint(greaterThanOrEqualTo: contentView.topAnchor, constant: Constants.ImageConstraints.top),
+            productImageView.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: Constants.ImageConstraints.bottom),
+            productImageView.widthAnchor.constraint(equalToConstant: Constants.ImageConstraints.width),
+            productImageView.heightAnchor.constraint(equalToConstant: Constants.ImageConstraints.height),
+            productImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: Constants.ImageConstraints.leading),
             productImageView.centerYAnchor.constraint(equalTo: centerYAnchor)
         ]
         
@@ -89,9 +118,9 @@ class CustomViewCell: UITableViewCell {
         contentView.addSubview(productTitle)
         
         let constraints: [NSLayoutConstraint] = [
-            productTitle.topAnchor.constraint(equalTo: productImageView.topAnchor, constant: Constants.topView.rawValue),
-            productTitle.leadingAnchor.constraint(equalTo: productImageView.trailingAnchor, constant: Constants.leadingAnchor.rawValue),
-            productTitle.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: Constants.trailingView.rawValue),
+            productTitle.topAnchor.constraint(equalTo: productImageView.topAnchor, constant: Constants.TitleLabel.top),
+            productTitle.leadingAnchor.constraint(equalTo: productImageView.trailingAnchor, constant: Constants.TitleLabel.leading),
+            productTitle.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: Constants.TitleLabel.trailing),
         ]
         
         NSLayoutConstraint.activate(constraints)
@@ -101,9 +130,9 @@ class CustomViewCell: UITableViewCell {
         contentView.addSubview(productPrice)
         
         let constraints: [NSLayoutConstraint] = [
-            productPrice.topAnchor.constraint(equalTo: productTitle.bottomAnchor,constant: Constants.topView.rawValue),
-            productPrice.leadingAnchor.constraint(equalTo: productImageView.trailingAnchor, constant: Constants.leadingAnchor.rawValue),
-            productPrice.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: Constants.trailingView.rawValue)
+            productPrice.topAnchor.constraint(equalTo: productTitle.bottomAnchor,constant: Constants.PriceLabel.top),
+            productPrice.leadingAnchor.constraint(equalTo: productImageView.trailingAnchor, constant: Constants.PriceLabel.leading),
+            productPrice.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: Constants.PriceLabel.trailing)
         ]
         
         NSLayoutConstraint.activate(constraints)
@@ -113,9 +142,9 @@ class CustomViewCell: UITableViewCell {
         contentView.addSubview(productCondition)
         
         let constraints: [NSLayoutConstraint] = [
-            productCondition.topAnchor.constraint(equalTo: productPrice.bottomAnchor,constant: Constants.topView.rawValue),
-            productCondition.leadingAnchor.constraint(equalTo: productImageView.trailingAnchor, constant: Constants.topView.rawValue),
-            productCondition.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: Constants.trailingView.rawValue),
+            productCondition.topAnchor.constraint(equalTo: productPrice.bottomAnchor,constant: Constants.ConditionLabel.top),
+            productCondition.leadingAnchor.constraint(equalTo: productImageView.trailingAnchor, constant: Constants.ConditionLabel.leading),
+            productCondition.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: Constants.ConditionLabel.trailing),
         ]
         
         NSLayoutConstraint.activate(constraints)

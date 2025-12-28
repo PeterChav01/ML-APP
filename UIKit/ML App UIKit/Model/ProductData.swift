@@ -7,14 +7,16 @@
 
 import Foundation
 
-struct Product: Decodable  {
-    let results: [ProductDetail]
+struct SearchResults: Decodable  {
+    let results: [ProductResult]
 }
 
-struct ProductDetail: Decodable {
+struct ProductResult: Decodable {
     let title: String
     let price: Double
     let condition: String
     let thumbnail: String
-    //let permalink: String
+    let id: String
 }
+
+
